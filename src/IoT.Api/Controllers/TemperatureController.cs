@@ -17,7 +17,9 @@ namespace IoT.Api.Controllers
         private readonly ITemperatureRepository _temperatureRepository;
         private readonly TemperatureSocketManager _socketManager;
 
-        public TemperatureController(AppDbContext appDbContext, TemperatureSocketManager socketManager,ITemperatureRepository temperatureRepository) : base(appDbContext, socketManager)
+        public TemperatureController(AppDbContext appDbContext, 
+                                    TemperatureSocketManager socketManager, 
+                                    ITemperatureRepository temperatureRepository) : base(appDbContext)
         {
             _temperatureRepository = temperatureRepository;
             _socketManager = socketManager;
@@ -27,15 +29,14 @@ namespace IoT.Api.Controllers
         {
             return View();
         }
-        //[Route("api/Report")]
+        [Route("api/Report")]
         public async Task Report(double liquidTemp)
         {
             var reading = new
             {
                 Date = DateTime.Now,
                 LiquidTemp = liquidTemp
-            };
-            
+            };            
     
             await _socketManager.SendMessageToAllAsync(JsonConvert.SerializeObject(reading));
         }
