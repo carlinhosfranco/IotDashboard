@@ -11,13 +11,11 @@ namespace IoT.Api.Controllers
     public class ApplicationController : Controller
     {
         private readonly AppDbContext _dbContext;
-        private readonly TemperatureSocketManager _socketManager;
         private bool _willCommit;
 
-        public ApplicationController(AppDbContext appDbContext, TemperatureSocketManager socketManager)
+        public ApplicationController(AppDbContext appDbContext)
         {
             _dbContext = appDbContext;
-            _socketManager = socketManager;
         }
         public override async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next) 
         {

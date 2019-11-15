@@ -8,10 +8,14 @@ namespace IoT.Api.Controllers
     //[Route("api/[controller]/{Action}")]
     public class HomeController : ApplicationController
     {
-        public HomeController(AppDbContext appDbContext, TemperatureSocketManager socketManager) : base(appDbContext, socketManager)
+        public HomeController(AppDbContext appDbContext) : base(appDbContext)
         {
         }       
         public IActionResult Index()
+        {
+            return View();                        
+        }
+        public IActionResult Simulator()
         {
             return View();                        
         }
