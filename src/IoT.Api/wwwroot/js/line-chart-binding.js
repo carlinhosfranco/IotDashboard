@@ -61,8 +61,8 @@ ko.bindingHandlers.lineChart = {
  
             // define the graph line
             line = d3.svg.line()
-                .x(function (d) { return x(d.Date); })
-                .y(function (d) { return y(d.LiquidTemp); }),
+                .x(function (d) { return x(d.CreateDate); })
+                .y(function (d) { return y(d.Value); }),
  
             svg = d3.select(element).select("svg g"),
  
@@ -70,8 +70,8 @@ ko.bindingHandlers.lineChart = {
             data = ko.unwrap(valueAccessor());
  
         // define the domain of the graph. max and min of the dimensions
-        x.domain(d3.extent(data, function (d) { return d.Date; }));
-        y.domain([0, d3.max(data, function (d) { return d.LiquidTemp; })]);
+        x.domain(d3.extent(data, function (d) { return d.CreateDate; }));
+        y.domain([0, d3.max(data, function (d) { return d.Value; })]);
  
         svg.select("g.x.axis")
             .transition()

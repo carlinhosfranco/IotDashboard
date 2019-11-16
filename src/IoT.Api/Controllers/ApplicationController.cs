@@ -1,21 +1,21 @@
-using System;
 using System.Threading.Tasks;
+using IoT.Domain.Helper;
 using IoT.Infra.Data;
-using IoT.Infra.SocketsManagers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Newtonsoft.Json;
 
 namespace IoT.Api.Controllers
 {
     public class ApplicationController : Controller
     {
         private readonly AppDbContext _dbContext;
+        protected readonly IoTDevicesSimulator IotSimulator; //Helpr that simulate the iot devices
         private bool _willCommit;
 
-        public ApplicationController(AppDbContext appDbContext)
+        protected ApplicationController(AppDbContext appDbContext, IoTDevicesSimulator iotSimulator)
         {
             _dbContext = appDbContext;
+            IotSimulator = iotSimulator;
         }
         public override async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next) 
         {

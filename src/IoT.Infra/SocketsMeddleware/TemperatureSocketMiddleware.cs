@@ -2,23 +2,35 @@ using System;
 using System.Net.WebSockets;
 using System.Threading;
 using System.Threading.Tasks;
-using IoT.Infra.SocketsManagers;
+using IoT.Domain.SocketsMeddleware;
+using IoT.Domain.SocketsManager;
 using Microsoft.AspNetCore.Http;
 
-namespace IoT.Infra.SocketMeddlewares
+namespace IoT.Infra.SocketsMeddleware
 {
-    public class TemperatureSocketMiddleware
+    public class TemperatureSocketMiddleware : ITemperatureSocketMiddleware
     {
         private readonly RequestDelegate _next;
-        private readonly TemperatureSocketManager _socketManager;
+        private readonly ITemperatureSocketManager _socketManager;
     
-        public TemperatureSocketMiddleware(RequestDelegate next,
-                                            TemperatureSocketManager socketManager)
+        public TemperatureSocketMiddleware(RequestDelegate next, ITemperatureSocketManager socketManager)                                    
         {
             _next = next;
             _socketManager = socketManager;
         }
     
+        private async Task Receive(WebSocket socket, Action<WebSocketReceiveResult, byte[]> handleMessage)
+        {
+            var buffer = new byte[1024 * 4];
+    
+            while (socket.State == WebSocketState.Open)
+            {
+                var result = await socket.ReceiveAsync(buffer: new ArraySegment<byte>(buffer),
+                                                        cancellationToken: CancellationToken.None);
+    
+                handleMessage(result, buffer);
+            }
+        }        
         public async Task Invoke(HttpContext context)
         {
             if (!context.WebSockets.IsWebSocketRequest)
@@ -38,18 +50,6 @@ namespace IoT.Infra.SocketMeddlewares
                     return;
                 }
             });
-        }    
-        private async Task Receive(WebSocket socket, Action<WebSocketReceiveResult, byte[]> handleMessage)
-        {
-            var buffer = new byte[1024 * 4];
-    
-            while (socket.State == WebSocketState.Open)
-            {
-                var result = await socket.ReceiveAsync(buffer: new ArraySegment<byte>(buffer),
-                                                        cancellationToken: CancellationToken.None);
-    
-                handleMessage(result, buffer);
-            }
         }
     }
 }

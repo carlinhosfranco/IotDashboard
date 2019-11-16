@@ -1,14 +1,12 @@
-using System.Collections.Generic;
+using IoT.Domain.Helper;
 using IoT.Infra.Data;
-using IoT.Infra.SocketsManagers;
 using Microsoft.AspNetCore.Mvc;
 
 namespace IoT.Api.Controllers
 {
-    //[Route("api/[controller]/{Action}")]
     public class HomeController : ApplicationController
     {
-        public HomeController(AppDbContext appDbContext) : base(appDbContext)
+        public HomeController(AppDbContext appDbContext, IoTDevicesSimulator iotSimulator) : base(appDbContext, iotSimulator)
         {
         }       
         public IActionResult Index()
@@ -19,11 +17,10 @@ namespace IoT.Api.Controllers
         {
             return View();                        
         }
-        public string Temperature()
+        /* public string Temperature()
         {
             return "View()";                        
-        }
-        //public IActionResult About()
+        } */
         public IActionResult About()
         {
             return View();
