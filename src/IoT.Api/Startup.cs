@@ -1,10 +1,12 @@
 ﻿using System;
 using IoT.Domain.Entities;
 using IoT.Domain.Repositories;
+using IoT.Domain.SocketsMeddleware;
+using IoT.Domain.SocketsManager;
 using IoT.Infra.Data;
 using IoT.Infra.Repositories;
-using IoT.Infra.SocketMeddlewares;
-using IoT.Infra.SocketsManagers;
+using IoT.Infra.SocketsMeddleware;
+using IoT.Infra.SocketsManager;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
@@ -13,6 +15,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using MQTTnet.AspNetCore;
+using IoT.Domain.Helper;
+using Microsoft.AspNetCore.Http;
 
 namespace IoT.Api
 {
@@ -59,7 +63,11 @@ namespace IoT.Api
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
             services.AddScoped<ITemperatureRepository, TemperatureRepository>();
-            services.AddSingleton<TemperatureSocketManager>();
+            services.AddSingleton<ITemperatureSocketMiddleware, TemperatureSocketMiddleware>();
+            services.AddScoped<IoTDevicesSimulator>();
+            
+            //services.AddSingleton<ITemperatureSocketManager>();
+            services.AddSingleton<ITemperatureSocketManager,TemperatureSocketManager>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -77,9 +85,18 @@ namespace IoT.Api
                 app.UseExceptionHandler("Home/Error");
             }
             
+            // app.Use( async (ctx,next) =>
+            // {
+            //     ITemperatureSocketManager socketManager = ctx.RequestServices.GetService<ITemperatureSocketManager>();
+            //     //await ctx.Response.WriteAsync(socketManager.TemperatureSocketManager());
+            // }
+
+            // );
+
             app.UseStaticFiles();
             app.UseWebSockets();
             app.UseMiddleware<TemperatureSocketMiddleware>();
+            //app.UseMiddleware<ITemperatureSocketMiddleware>();
          
             app.UseMvc(routes =>
             {

@@ -1,11 +1,11 @@
 using System;
-using System.Net;
 using System.Threading.Tasks;
 using IoT.Domain.Commands.TemperatureCommands.Input;
 using IoT.Domain.Entities;
+using IoT.Domain.Helper;
 using IoT.Domain.Repositories;
+using IoT.Domain.SocketsManager;
 using IoT.Infra.Data;
-using IoT.Infra.SocketsManagers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
@@ -15,41 +15,21 @@ namespace IoT.Api.Controllers
     public class TemperatureController : ApplicationController
     {
         private readonly ITemperatureRepository _temperatureRepository;
-        private readonly TemperatureSocketManager _socketManager;
+        private readonly ITemperatureSocketManager _socketTemp;
 
-        public TemperatureController(AppDbContext appDbContext, TemperatureSocketManager socketManager,ITemperatureRepository temperatureRepository) : base(appDbContext, socketManager)
+        public TemperatureController(AppDbContext appDbContext,
+                                    IoTDevicesSimulator iotSimulator,
+                                    ITemperatureSocketManager socketTemp, 
+                                    ITemperatureRepository temperatureRepository) : base(appDbContext, iotSimulator)
         {
             _temperatureRepository = temperatureRepository;
-            _socketManager = socketManager;
+            _socketTemp = socketTemp;
         }
-
         public IActionResult Index()
         {
             return View();
         }
-        //[Route("api/Report")]
-        public async Task Report(double liquidTemp)
-        {
-            var reading = new
-            {
-                Date = DateTime.Now,
-                LiquidTemp = liquidTemp
-            };
-            
-    
-            await _socketManager.SendMessageToAllAsync(JsonConvert.SerializeObject(reading));
-        }
-        [Route("api/Generate")]
-        public async Task Generate()
-        {
-            var rnd = new Random();
-    
-            for(var i = 0; i < 100; i++)
-            {                
-                await Report(rnd.Next(23, 35));
-                await Task.Delay(5000);
-            }
-        }        
+        
         [HttpGet]
         [Route("api/temperatures/")]
         [AllowAnonymous]

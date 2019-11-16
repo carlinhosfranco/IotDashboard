@@ -306,3 +306,5 @@ modules.order
 Module.symvers
 Mkfile.old
 dkms.conf
+src/IoT.Api/*.db
+*.db
